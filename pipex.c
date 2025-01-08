@@ -6,7 +6,7 @@
 /*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/06 21:06:57 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:37:12 by otzarwal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,47 +57,82 @@ char *find_path(char **path)
 	return (NULL);
 }
 
-char  *check_exec(t_piplist *p)
+char  *check_exec(char *p, char **env)
 {
 	char *full_path = NULL;
-	p->cmd1 = ft_split(p->av[2], ' ');
-	p->cmd2 = ft_split(p->av[3], ' ');
-
-	char *path = find_path(p->en) + 5;
-	char **path_cmd = ft_split(path, ':');
-
+	char *path = find_path(env);
+	if (!path)
+		return (NULL);
+	char **path_cmd = ft_split(path + 5, ':');
 
 	while(*path_cmd)
 	{
 		full_path = ft_strjoin(*path_cmd, "/");
-		full_path = ft_strjoin(full_path, *p->cmd1);
+		full_path = ft_strjoin(full_path, p);
 		if (access(full_path, X_OK) == 0)
 			break;
 		free(full_path);
 		path_cmd++;
 	}
-	printf("%s\n", full_path);
-	
+	return (full_path);
+}
 
+void execution_(t_piplist av)
+{
+	int i = 0;
+	int size = av.ac - 3;
+	char **tmp;
+	int tmp_in = 0;
 
-	return (*path_cmd);
+	while (i < size)
+	{
+		tmp = ft_split(av.av[i + 2], ' ');
+		pipe(av.p_fd);
+		int pid = fork();
+		if (pid == 0)
+		{
+			if (i != 0)
+				dup2(tmp_in, STDIN_FILENO);
+			if (i + 1 != size)
+				dup2(av.p_fd[1], 1);
+			else
+				dup2(av.out, 1);
+			close(av.p_fd[0]);
+			tmp[0] = check_exec(tmp[0], av.env);
+			if (!tmp[0])
+			{
+				dprintf(2, "Commend NOt found\n");
+				return ;
+			}
+			execve(tmp[0], tmp, av.env);
+		}
+		else
+		{
+			tmp_in = av.p_fd[0];
+			close(av.p_fd[1]);
+			i++;
+		}
+	}
+	while ((waitpid(-1, NULL, 0)) > 0)
+	;
 }
 
 int	main(int ac, char **av, char **env)
 {
-	if (ac == 5)
+	if (ac >= 5)
 	{
 		t_piplist p_list;
 
 		p_list.av = av;
-		p_list.en = env;
+		p_list.env = env;
 		p_list.ac = ac;
 
 		p_list.in = open("file1", O_RDONLY);
 		p_list.out = open("file2", O_CREAT | O_WRONLY | O_TRUNC , 0777);
 
-		check_exec(&p_list);
-
+		dup2(p_list.in, STDIN_FILENO);
+		execution_(p_list);
+		// while (1);
 
 	}
 	else

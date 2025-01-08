@@ -10,7 +10,7 @@
 
 typedef struct s_piplist{
 	char **av;
-	char **en;
+	char **env;
 	int ac;
 	int p_fd[2];
 	int in;
