@@ -6,7 +6,7 @@
 /*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/08 16:37:12 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/14 11:55:22 by otzarwal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,9 +92,15 @@ void execution_(t_piplist av)
 		if (pid == 0)
 		{
 			if (i != 0)
+			{
 				dup2(tmp_in, STDIN_FILENO);
+				printf("%d\n", tmp_in);
+			}
 			if (i + 1 != size)
+			{
 				dup2(av.p_fd[1], 1);
+				close(av.p_fd[1]);
+			}
 			else
 				dup2(av.out, 1);
 			close(av.p_fd[0]);
@@ -131,8 +137,12 @@ int	main(int ac, char **av, char **env)
 		p_list.out = open("file2", O_CREAT | O_WRONLY | O_TRUNC , 0777);
 
 		dup2(p_list.in, STDIN_FILENO);
+		close(p_list.in);
 		execution_(p_list);
-		// while (1);
+
+
+		close(p_list.in);
+		close(p_list.out);
 
 	}
 	else
