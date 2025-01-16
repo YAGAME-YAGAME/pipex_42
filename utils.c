@@ -27,3 +27,37 @@ char *ft_strjoin(char const *s1, char const *s2)
 	// free((void *)s1);
     return (p);
 }
+
+int ft_strlen(char *s)
+{
+	int i;
+
+	i = 0;
+	while(s[i])
+		i++;
+	return (i);
+}
+
+char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
+{
+	size_t	i;
+	int		j;
+
+	i = 0;
+	if (needle[i] == 0)
+		return ((char *)haystack);
+	if (!haystack && len == 0)
+		return (NULL);
+	while (haystack[i] && (len - i) >= ft_strlen((char *)needle))
+	{
+		j = 0;
+		while (needle[j] && haystack[i + j] == needle[j])
+		{
+			j++;
+			if (needle[j] == '\0')
+				return ((char *)haystack + i);
+		}
+		i++;
+	}
+	return (NULL);
+}

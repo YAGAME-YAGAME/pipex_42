@@ -6,45 +6,13 @@
 /*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/14 11:55:22 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/16 19:14:18 by otzarwal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int ft_strlen(char *s)
-{
-	int i;
 
-	i = 0;
-	while(s[i])
-		i++;
-	return (i);
-}
-
-char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
-{
-	size_t	i;
-	int		j;
-
-	i = 0;
-	if (needle[i] == 0)
-		return ((char *)haystack);
-	if (!haystack && len == 0)
-		return (NULL);
-	while (haystack[i] && (len - i) >= ft_strlen((char *)needle))
-	{
-		j = 0;
-		while (needle[j] && haystack[i + j] == needle[j])
-		{
-			j++;
-			if (needle[j] == '\0')
-				return ((char *)haystack + i);
-		}
-		i++;
-	}
-	return (NULL);
-}
 
 char *find_path(char **path)
 {
@@ -76,51 +44,53 @@ char  *check_exec(char *p, char **env)
 	}
 	return (full_path);
 }
+void	ft_proc(t_piplist av)
+{
+	if (av.index != 2)
+	{
+		dup2(av.tmp_in, STDIN_FILENO);
+	}
+	if (av.index + 1 != av.ac - 1)
+	{
+		dup2(av.p_fd[1], 1);
+		close(av.p_fd[1]);
+	}
+	else
+	{
+		dup2(av.out, 1);
+		close(av.p_fd[1]);
+	}
+	// close(av.p_fd[0]);
+	av.tmp[0] = check_exec(av.tmp[0], av.env);
+	if (!av.tmp[0])
+	{
+		dprintf(2, "Commend NOt found\n");
+		return ;
+	}
+	execve(av.tmp[0], av.tmp, av.env);
+}
 
 void execution_(t_piplist av)
 {
-	int i = 0;
-	int size = av.ac - 3;
-	char **tmp;
-	int tmp_in = 0;
+	av.tmp_in = 0;
 
-	while (i < size)
+	while (av.index < av.ac - 1)
 	{
-		tmp = ft_split(av.av[i + 2], ' ');
-		pipe(av.p_fd);
+		av.tmp = parsing_split(av.av[av.index]);
+		if ((pipe(av.p_fd)) == -1 )
+		{
+			dprintf(2, "pipe deosn't work");
+		}
 		int pid = fork();
 		if (pid == 0)
-		{
-			if (i != 0)
-			{
-				dup2(tmp_in, STDIN_FILENO);
-				printf("%d\n", tmp_in);
-			}
-			if (i + 1 != size)
-			{
-				dup2(av.p_fd[1], 1);
-				close(av.p_fd[1]);
-			}
-			else
-				dup2(av.out, 1);
-			close(av.p_fd[0]);
-			tmp[0] = check_exec(tmp[0], av.env);
-			if (!tmp[0])
-			{
-				dprintf(2, "Commend NOt found\n");
-				return ;
-			}
-			execve(tmp[0], tmp, av.env);
-		}
+			ft_proc(av);
 		else
 		{
-			tmp_in = av.p_fd[0];
+			av.tmp_in = av.p_fd[0];
 			close(av.p_fd[1]);
-			i++;
 		}
+		av.index++;
 	}
-	while ((waitpid(-1, NULL, 0)) > 0)
-	;
 }
 
 int	main(int ac, char **av, char **env)
@@ -132,18 +102,20 @@ int	main(int ac, char **av, char **env)
 		p_list.av = av;
 		p_list.env = env;
 		p_list.ac = ac;
+		p_list.index = 2;
 
 		p_list.in = open("file1", O_RDONLY);
 		p_list.out = open("file2", O_CREAT | O_WRONLY | O_TRUNC , 0777);
-
 		dup2(p_list.in, STDIN_FILENO);
-		close(p_list.in);
 		execution_(p_list);
 
-
+		while ((waitpid(-1, NULL, 0)) > 0)
+			;
 		close(p_list.in);
 		close(p_list.out);
-
+		close(p_list.p_fd[0]);
+		close(p_list.p_fd[1]);
+		while(1) ;
 	}
 	else
 		printf("the arg is not valid");
