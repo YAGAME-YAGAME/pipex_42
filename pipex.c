@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/16 19:14:18 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/17 18:19:18 by yagame           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ void	ft_proc(t_piplist av)
 	{
 		dup2(av.tmp_in, STDIN_FILENO);
 	}
+	else
+		dup2(av.in, STDIN_FILENO);
 	if (av.index + 1 != av.ac - 1)
 	{
 		dup2(av.p_fd[1], 1);
@@ -61,11 +63,12 @@ void	ft_proc(t_piplist av)
 		close(av.p_fd[1]);
 	}
 	// close(av.p_fd[0]);
+	// close(av.p_fd[1]);
 	av.tmp[0] = check_exec(av.tmp[0], av.env);
 	if (!av.tmp[0])
 	{
 		dprintf(2, "Commend NOt found\n");
-		return ;
+		exit(1);
 	}
 	execve(av.tmp[0], av.tmp, av.env);
 }
@@ -80,16 +83,26 @@ void execution_(t_piplist av)
 		if ((pipe(av.p_fd)) == -1 )
 		{
 			dprintf(2, "pipe deosn't work");
+			exit(1);
 		}
 		int pid = fork();
 		if (pid == 0)
 			ft_proc(av);
 		else
 		{
-			av.tmp_in = av.p_fd[0];
 			close(av.p_fd[1]);
+			if (av.tmp_in != -1)
+				close(av.tmp_in);
+			av.tmp_in = av.p_fd[0];
+			if (av.index == av.ac - 2)
+				close(av.tmp_in);
+
 		}
 		av.index++;
+	}
+	while (wait(NULL) > 0)
+	{
+		dprintf(2, "here|\n");
 	}
 }
 
@@ -106,16 +119,12 @@ int	main(int ac, char **av, char **env)
 
 		p_list.in = open("file1", O_RDONLY);
 		p_list.out = open("file2", O_CREAT | O_WRONLY | O_TRUNC , 0777);
-		dup2(p_list.in, STDIN_FILENO);
+		// dup2(p_list.in, STDIN_FILENO);
 		execution_(p_list);
 
-		while ((waitpid(-1, NULL, 0)) > 0)
-			;
+
 		close(p_list.in);
 		close(p_list.out);
-		close(p_list.p_fd[0]);
-		close(p_list.p_fd[1]);
-		while(1) ;
 	}
 	else
 		printf("the arg is not valid");

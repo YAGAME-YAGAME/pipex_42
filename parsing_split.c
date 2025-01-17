@@ -69,6 +69,8 @@ char **parsing_split(char *s)
 		}
 		len = end - start;
 		buff[j] = malloc(len + 1);
+		if (!buff[j])
+			return NULL;
 		i = 0;
 		while( i < len)
 			buff[j][i++] = *start++;
