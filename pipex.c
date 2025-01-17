@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
+/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/17 18:19:18 by yagame           ###   ########.fr       */
+/*   Updated: 2025/01/17 23:09:58 by otzarwal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ char  *check_exec(char *p, char **env)
 		if (access(full_path, X_OK) == 0)
 			break;
 		free(full_path);
+		full_path = NULL;
 		path_cmd++;
 	}
 	return (full_path);
@@ -62,12 +63,10 @@ void	ft_proc(t_piplist av)
 		dup2(av.out, 1);
 		close(av.p_fd[1]);
 	}
-	// close(av.p_fd[0]);
-	// close(av.p_fd[1]);
 	av.tmp[0] = check_exec(av.tmp[0], av.env);
 	if (!av.tmp[0])
 	{
-		dprintf(2, "Commend NOt found\n");
+		dprintf(2, "Commend Not found\n");
 		exit(1);
 	}
 	execve(av.tmp[0], av.tmp, av.env);
@@ -76,6 +75,8 @@ void	ft_proc(t_piplist av)
 void execution_(t_piplist av)
 {
 	av.tmp_in = 0;
+	int status;
+	pid_t pid;
 
 	while (av.index < av.ac - 1)
 	{
@@ -85,7 +86,7 @@ void execution_(t_piplist av)
 			dprintf(2, "pipe deosn't work");
 			exit(1);
 		}
-		int pid = fork();
+		pid = fork();
 		if (pid == 0)
 			ft_proc(av);
 		else
@@ -100,10 +101,8 @@ void execution_(t_piplist av)
 		}
 		av.index++;
 	}
-	while (wait(NULL) > 0)
-	{
-		dprintf(2, "here|\n");
-	}
+	while (waitpid(pid, &status, 0) > 0)
+		;
 }
 
 int	main(int ac, char **av, char **env)
@@ -118,8 +117,17 @@ int	main(int ac, char **av, char **env)
 		p_list.index = 2;
 
 		p_list.in = open("file1", O_RDONLY);
+		if (p_list.in == -1)
+		{
+			perror("input file doesn't open");
+			return (1);
+		}
 		p_list.out = open("file2", O_CREAT | O_WRONLY | O_TRUNC , 0777);
-		// dup2(p_list.in, STDIN_FILENO);
+		if (p_list.in == -1)
+		{
+			perror("output file doesn't open");
+			exit(EXIT_FAILURE	);
+		}
 		execution_(p_list);
 
 
