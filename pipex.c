@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/17 23:09:58 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/19 16:14:16 by yagame           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ char  *check_exec(char *p, char **env)
 	char *path = find_path(env);
 	if (!path)
 		return (NULL);
-	char **path_cmd = ft_split(path + 5, ':');
+	char **path_cmd = parsing_split(path + 5, ':');
 
 	while(*path_cmd)
 	{
@@ -80,7 +80,11 @@ void execution_(t_piplist av)
 
 	while (av.index < av.ac - 1)
 	{
-		av.tmp = parsing_split(av.av[av.index]);
+		av.tmp = parsing_split(av.av[av.index], ' ');
+		if (!av.tmp)
+		{
+			exit(1);
+		}
 		if ((pipe(av.p_fd)) == -1 )
 		{
 			dprintf(2, "pipe deosn't work");
@@ -116,13 +120,13 @@ int	main(int ac, char **av, char **env)
 		p_list.ac = ac;
 		p_list.index = 2;
 
-		p_list.in = open("file1", O_RDONLY);
+		p_list.in = open(av[1], O_RDONLY);
 		if (p_list.in == -1)
 		{
 			perror("input file doesn't open");
 			return (1);
 		}
-		p_list.out = open("file2", O_CREAT | O_WRONLY | O_TRUNC , 0777);
+		p_list.out = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC , 0777);
 		if (p_list.in == -1)
 		{
 			perror("output file doesn't open");

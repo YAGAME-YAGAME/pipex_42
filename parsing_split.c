@@ -1,12 +1,24 @@
 #include "pipex.h"
 
-int count(char *s)
+
+char *free_all(char **buff, int j)
+{
+	while (j >= 0)
+	{
+		free(buff[j]);
+		buff[j] = NULL;
+		j--;
+	}
+	free(buff);
+	return NULL;
+}
+int count(char *s, char p)
 {
 	int i = 0;
 	char *c = "\'";
 	while(*s)
 	{
-		while(*s && *s == ' ')
+		while(*s && *s == p)
 			s++;
 		if (!s)
 			break;
@@ -17,9 +29,9 @@ int count(char *s)
 				s++;
 			s++;
 		}
-		while(*s && !(*s == ' ' || *s == *c))
+		while(*s && !(*s == p || *s == *c))
 			s++;
-		while(*s && *s == ' ')
+		while(*s && *s == p)
 			s++;
 		if (!s)
 			break;
@@ -27,60 +39,71 @@ int count(char *s)
 	}
 	return (i);
 }
-
-
-char **parsing_split(char *s)
+void	skip(char **s, int *len, char p, char **start)
 {
+	char *end;
+	char quote;
 
+	quote = '\'';
+	while(**s && **s == p)
+		(*s)++;
+	if (!*s)
+		return ;
+	*start = *s;
+	if (**s && **s == quote)
+	{
+		(*s)++;
+		*start = *s;
+		while (**s && **s != quote)
+			(*s)++;
+		end = *s;
+		(*s)++;
+	}
+	else
+	{
+		while(**s && !(**s == p))
+			(*s)++;
+		end = *s;
+	}
+	*len = end - *start;
+}
+void	edit(int len, int j, char *start,char **buff)
+{
 	int i;
-	char *c = "\'";
+
+	i = 0;
+	while( i < len)
+		{
+			buff[j][i++] = *start++;
+		}
+	buff[j][i] = '\0';
+}
+char **parsing_split(char *s, char p)
+{
+	char **buff;
+	char *start, *end;
+	int wc;
+	int len;
+	int j;
+
 	if (!s)
 		return NULL;
-	int wc = count(s);
-
-	char **buff;
-	buff = malloc((wc + 1) * sizeof(char *));
-	if (!buff)
+	wc = count(s, p);
+	len = 0;
+	if (!(buff = malloc((wc + 1) * sizeof(char *))))
 		return (NULL);
-	char *start, *end;
-	int len = 0;
-	int j = 0;
+	len = 0;
+	j = 0;
 	while(j < wc)
 	{
-		while(*s && *s == ' ')
-			s++;
-		if (!s)
-			break;
-		start = s;
-		if (*s && *s == *c)
-		{
-			s++;
-			start = s;
-			while (*s && *s != *c)
-				s++;
-			end = s;
-			s++;
-		}
-		else
-		{
-			while(*s && !(*s == ' '))
-				s++;
-			end = s;
-		}
-		len = end - start;
+		skip(&s, &len, p, &start);
 		buff[j] = malloc(len + 1);
 		if (!buff[j])
-			return NULL;
-		i = 0;
-		while( i < len)
-			buff[j][i++] = *start++;
-		buff[j][i] = '\0';
+			return (free_all(buff, j), NULL );
+		edit(len, j, start, buff);
 		j++;
-
 	}
 	buff[j] = NULL;
-
 	return buff;
-
 }
 

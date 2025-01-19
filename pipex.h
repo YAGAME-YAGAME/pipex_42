@@ -21,7 +21,7 @@ typedef struct s_piplist{
 }	t_piplist;
 
 int ft_strlen(char *s);
-char **parsing_split(char *s);
+char **parsing_split(char *s, char p);
 char **ft_split(char const *s, char c);
 char *ft_strjoin(char const *s1, char const *s2);
 char	*ft_strnstr(const char *haystack, const char *needle, size_t len);
