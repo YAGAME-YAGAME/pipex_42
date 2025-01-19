@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
+/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/19 16:14:16 by yagame           ###   ########.fr       */
+/*   Updated: 2025/01/19 17:41:27 by otzarwal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ char  *check_exec(char *p, char **env)
 		full_path = NULL;
 		path_cmd++;
 	}
+	free_all(path_cmd);
+	free(p);
 	return (full_path);
 }
 void	ft_proc(t_piplist av)
@@ -65,10 +67,7 @@ void	ft_proc(t_piplist av)
 	}
 	av.tmp[0] = check_exec(av.tmp[0], av.env);
 	if (!av.tmp[0])
-	{
-		dprintf(2, "Commend Not found\n");
-		exit(1);
-	}
+		ft_error("Command not found", 0);
 	execve(av.tmp[0], av.tmp, av.env);
 }
 
@@ -82,15 +81,11 @@ void execution_(t_piplist av)
 	{
 		av.tmp = parsing_split(av.av[av.index], ' ');
 		if (!av.tmp)
-		{
-			exit(1);
-		}
+			ft_error("split", 0);
 		if ((pipe(av.p_fd)) == -1 )
-		{
-			dprintf(2, "pipe deosn't work");
-			exit(1);
-		}
-		pid = fork();
+			ft_error("pipe", 0);
+		if ((pid = fork()) == -1)
+			ft_error("fork", 0);
 		if (pid == 0)
 			ft_proc(av);
 		else
@@ -101,12 +96,10 @@ void execution_(t_piplist av)
 			av.tmp_in = av.p_fd[0];
 			if (av.index == av.ac - 2)
 				close(av.tmp_in);
-
 		}
 		av.index++;
 	}
-	while (waitpid(pid, &status, 0) > 0)
-		;
+	while (waitpid(pid, &status, 0) > 0) ;
 }
 
 int	main(int ac, char **av, char **env)
@@ -119,22 +112,13 @@ int	main(int ac, char **av, char **env)
 		p_list.env = env;
 		p_list.ac = ac;
 		p_list.index = 2;
-
 		p_list.in = open(av[1], O_RDONLY);
 		if (p_list.in == -1)
-		{
-			perror("input file doesn't open");
-			return (1);
-		}
+			ft_error(av[1], 0);
 		p_list.out = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC , 0777);
 		if (p_list.in == -1)
-		{
-			perror("output file doesn't open");
-			exit(EXIT_FAILURE	);
-		}
+			ft_error(av[ac - 1], 0);
 		execution_(p_list);
-
-
 		close(p_list.in);
 		close(p_list.out);
 	}

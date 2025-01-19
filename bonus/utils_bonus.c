@@ -1,5 +1,14 @@
 #include "pipex.h"
 
+char *free_all(char **bf)
+{
+	while(*bf)
+	{
+		free(*bf);
+		*bf = NULL;
+	}
+	free(bf);
+}
 
 char *ft_strjoin(char const *s1, char const *s2)
 {
