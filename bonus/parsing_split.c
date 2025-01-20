@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_split.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:43:18 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/19 17:43:23 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/19 18:33:15 by yagame           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 char *free_all(char **buff, int j)
 {

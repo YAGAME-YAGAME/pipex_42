@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:43:07 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/19 17:43:10 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/20 17:39:12 by yagame           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ typedef struct s_piplist{
 	char *cmd;
 }	t_piplist;
 
-int	ft_strlen(char *s);
-char *free_all(char **bf);
+size_t	ft_strlen(char *s);
+int count(char *s, char p);
+void 	free_all(char **bf, int j);
 void	ft_error(char *message, int exit_code);
 char **parsing_split(char *s, char p);
 char *ft_strjoin(char const *s1, char const *s2);

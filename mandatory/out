@@ -1,0 +1,9 @@
+total 184$
+-rwxr-xr-x@ 1 yagame  staff  69368 Jan 20 17:54 a.out$
+-rw-r--r--@ 1 yagame  staff    996 Jan 19 18:15 ft_error.c$
+-rw-r--r--@ 1 yagame  staff     64 Jan 19 18:15 in$
+-rwxr-xr-x@ 1 yagame  staff      0 Jan 20 18:00 out$
+-rw-r--r--@ 1 yagame  staff   2194 Jan 20 17:48 parsing_split.c$
+-rw-r--r--@ 1 yagame  staff   2886 Jan 20 17:52 pipex.c$
+-rw-r--r--@ 1 yagame  staff   1477 Jan 20 17:39 pipex.h$
+-rw-r--r--@ 1 yagame  staff   1105 Jan 20 17:35 utils.c$

@@ -1,18 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:57:16 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/19 17:41:27 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/19 21:28:08 by yagame           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-
+#include "pipex_bonus.h"
 
 char *find_path(char **path)
 {
@@ -76,7 +74,10 @@ void execution_(t_piplist av)
 	av.tmp_in = 0;
 	int status;
 	pid_t pid;
-
+	if (av.herdoc && av.index == 3)
+	{
+		here_doc(av);
+	}
 	while (av.index < av.ac - 1)
 	{
 		av.tmp = parsing_split(av.av[av.index], ' ');
@@ -107,14 +108,15 @@ int	main(int ac, char **av, char **env)
 	if (ac >= 5)
 	{
 		t_piplist p_list;
-
-		p_list.av = av;
-		p_list.env = env;
-		p_list.ac = ac;
-		p_list.index = 2;
-		p_list.in = open(av[1], O_RDONLY);
-		if (p_list.in == -1)
-			ft_error(av[1], 0);
+		init_list(&p_list, av, env, ac);
+		if (check_herdoc(av[1]))
+			init_herdoc(&p_list);
+		else
+		{
+			p_list.in = open(av[1], O_RDONLY);
+			if (p_list.in == -1)
+				ft_error(av[1], 0);
+		}
 		p_list.out = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC , 0777);
 		if (p_list.in == -1)
 			ft_error(av[ac - 1], 0);

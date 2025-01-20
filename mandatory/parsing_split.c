@@ -3,26 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_split.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otzarwal <otzarwal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yagame <yagame@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:43:18 by otzarwal          #+#    #+#             */
-/*   Updated: 2025/01/19 17:43:23 by otzarwal         ###   ########.fr       */
+/*   Updated: 2025/01/20 17:48:48 by yagame           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char *free_all(char **buff, int j)
-{
-	while (j >= 0)
-	{
-		free(buff[j]);
-		buff[j] = NULL;
-		j--;
-	}
-	free(buff);
-	return NULL;
-}
 int count(char *s, char p)
 {
 	int i = 0;
@@ -92,7 +81,7 @@ void	edit(int len, int j, char *start,char **buff)
 char **parsing_split(char *s, char p)
 {
 	char **buff;
-	char *start, *end;
+	char *start;
 	int wc;
 	int len;
 	int j;
@@ -110,7 +99,7 @@ char **parsing_split(char *s, char p)
 		skip(&s, &len, p, &start);
 		buff[j] = malloc(len + 1);
 		if (!buff[j])
-			return (free_all(buff, j), NULL );
+			return (free_all(buff, j - 1), NULL );
 		edit(len, j, start, buff);
 		j++;
 	}

@@ -1,4 +1,4 @@
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 char *free_all(char **bf)
 {
@@ -9,6 +9,8 @@ char *free_all(char **bf)
 	}
 	free(bf);
 }
+
+
 
 char *ft_strjoin(char const *s1, char const *s2)
 {

@@ -1,11 +1,12 @@
 #include "pipex.h"
 
-char *free_all(char **bf)
+void	free_all(char **bf,int j)
 {
-	while(*bf)
+	while(j >= 0)
 	{
-		free(*bf);
-		*bf = NULL;
+		free(bf[j]);
+		bf[j] = NULL;
+		j--;
 	}
 	free(bf);
 }
@@ -37,9 +38,9 @@ char *ft_strjoin(char const *s1, char const *s2)
     return (p);
 }
 
-int ft_strlen(char *s)
+size_t ft_strlen(char *s)
 {
-	int i;
+	size_t i;
 
 	i = 0;
 	while(s[i])
